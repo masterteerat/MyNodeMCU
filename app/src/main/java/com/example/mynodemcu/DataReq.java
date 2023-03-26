@@ -8,6 +8,11 @@ public class DataReq {
 
     public DataReq() {}
 
+    public DataReq(String cmd) {
+
+        this.cmd = cmd;
+    }
+
     public void setCmd(String cmd) {this.cmd = cmd;};
 
 }
