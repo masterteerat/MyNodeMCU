@@ -18,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     private Timer myTimer;
     private String status;
+    private String apistatus;
     private String temp;
     private TextView txtTemp;
 
@@ -25,35 +26,49 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        status = "wait";
         txtTemp = findViewById(R.id.textnum);
 
         myTimer = new Timer();
         myTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                checkTemp();
                 getTemp();
             }
 
-        }, 500, 500);
+        }, 5000, 500);
+
+
 
     }
 
-    void getTemp() {
-        checkTemp();
-        if (status.equals("yes")) {
-            txtTemp.setText(temp);
-        } else {
-            txtTemp.setText("error has occurred");
-        }
+    private void setText(final TextView txtTemp ,final String showtxt){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                txtTemp.setText(showtxt);
+            }
+        });
+    }
 
+    void getTemp() {
+        if (apistatus.equals("done")) {
+            if (status.equals("yes")) {
+                setText(txtTemp, temp);
+            } else {
+                setText(txtTemp,"error has occurred");
+            }
+        }
+        apistatus = "checking";
     }
 
     void checkTemp() {
 
+        apistatus = "checking";
         Retrofit api = new Retrofit.Builder()
 
-                .baseUrl()
+                .baseUrl("http://192.168.1.202:8080")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -76,5 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("artoy", t.toString());
             }
         });
+        apistatus = "done";
     }
 }
